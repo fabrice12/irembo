@@ -25,6 +25,7 @@ public class UserService {
 //        kafkaTemplate.send("user-verification",user);
 //        return user;
 //    }
+
     public void sendUserVerification(VerificationRequest verificationRequest){
         kafkaTemplate.send("verification-request", verificationRequest);
     }

@@ -8,6 +8,7 @@ import io.rhenez.irembotest.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,10 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -97,6 +96,36 @@ public class LoginController {
         mailService.sendNewUserEmail(existingUser, "Irembo Password Reset", "Your password has been reset", password);
         redirectAttributes.addFlashAttribute("success", "Password reset successfully");
         return "redirect:/login";
+    }
+    @GetMapping("/validate/otp/{token}")
+    public String validateOtp(@PathVariable String token, Model model) {
+        model.addAttribute("token", token);
+        return "otp";
+    }
+    @PostMapping("/validate/otp")
+    public String validateOtp(WebRequest request, RedirectAttributes ra) {
+        String otp = request.getParameter("otp");
+        String token = request.getParameter("token");
+        User user = userRepository.findUserByOtpToken(token);
+        if (user != null) {
+            if (user.getOTP().equals(otp)) {
+                user.setOTP(null);
+                user.setOtpToken(null);
+                userService.saveUser(user);
+                IremboUserPrincipal iremboUserPrincipal= new IremboUserPrincipal(user);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(iremboUserPrincipal, null, iremboUserPrincipal.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                return "redirect:/";
+            } else {
+                ra.addFlashAttribute("error", "Invalid OTP");
+                return "redirect:/validate/otp/" + token;
+            }
+        } else {
+            ra.addFlashAttribute("error", "Invalid token");
+            return "redirect:/login";
+        }
+
     }
 
 

@@ -1,5 +1,6 @@
 package io.rhenez.irembotest.config;
 
+import io.rhenez.irembotest.security.CustomSuccessHandler;
 import io.rhenez.irembotest.security.IremboPrincipalDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,8 +55,11 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/forgot").permitAll()
                 .antMatchers("/forgot-user").permitAll()
+                .antMatchers("/validate/otp").permitAll()
+                .antMatchers("/validate/otp/*").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login").failureUrl("/login?error=true").usernameParameter("email").permitAll()
+                .successHandler(successHandler())
                 .and().logout().logoutSuccessUrl("/login?logout=true").invalidateHttpSession(true).deleteCookies("JSESSIONID", "remember-me").permitAll()
                 .and().rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400)
                 .and().csrf().disable().userDetailsService(userDetailsService());
@@ -76,6 +80,11 @@ public class SecurityConfig {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public CustomSuccessHandler successHandler() {
+        return new CustomSuccessHandler();
     }
 
 

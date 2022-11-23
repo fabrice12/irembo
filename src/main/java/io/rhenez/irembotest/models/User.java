@@ -57,7 +57,8 @@ public class User {
     private String status;
     @Column(name="otp")
     private String OTP;
-
+    @Column(name="otp_token")
+    private String OtpToken;
     @Column(name="created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
