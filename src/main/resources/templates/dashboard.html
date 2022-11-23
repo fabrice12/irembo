@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Irembo</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.2/css/bootstrap.min.css}"/>
+
+
+</head>
+<style>
+
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+
+    .h-custom {
+        height: calc(100% - 73px);
+    }
+
+    @media (max-width: 450px) {
+        .h-custom {
+            height: 100%;
+        }
+    }
+</style>
+<body class="bg-light">
+
+<div class="">
+    <section>
+        <div class="container">
+            <div class="row  rounded-sm p-5 mt justify-content-center align-items-center">
+
+                <div class="col-md-6 col-lg-3 col-xl-5">
+                    <h1 class="display-3">I-Verification</h1>
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+                         class="img-fluid" alt="Sample image">
+                    <a  th:href="@{/logout}" class="  mt-2 w-25 btn btn-danger justify-content-end">Logout</a>
+
+                    <!--        <img th:src="@{/img/irembo.png}" class="img-fluid">-->
+                    <!--        <h1 class="display-3">Irembo Verification System</h1>-->
+
+                </div>
+                <div class="col-md-6 bg-white rounded-sm">
+                    <div class="row my-2  justify-content-center ">
+                        <img th:src="${'/uploads/users/profile/' + user.getProfilePicture() }"
+                             class="img-fluid rounded-circle" style="width: 50%" alt="Profile image">
+
+                            <p class="text-center lead ">[[${user.getFirstName()}]]  [[${user.getLastName()}]]
+                                <span  th:if="${user.getStatus()=='VERIFIED'}" class="  badge bg-primary ">Verified</span>
+                            </p>
+
+
+
+                        <p class="text-center fw-bold">[[${user.getGender()}]] <span class="badge bg-info">[[${user.getAge()}]]</span></p>
+                        <ul class="list-group px-2 ">
+                            <li class="list-group-item"><i class="fw-bold" >Email: </i>[[${user.getEmail()}]]</li>
+                            <li class="list-group-item"><i class="fw-bold">Phone: </i>[[${user.getPhoneNumber()}]]</li>
+                            <li class="list-group-item"><i class="fw-bold">Martal Status: </i>[[${user.getMartalStatus()}]]</li>
+                            <li class="list-group-item"><i class="fw-bold">Date of Birth: </i>[[${user.getDateOfBirth}]]</li>
+                            <li class="list-group-item"><i class="fw-bold">Nationality: </i>[[${user.getNationality()}]]</li>
+                            <li class="list-group-item"><i class="fw-bold">Status: </i>
+                                <span th:if="${user.getStatus()=='PENDING VERIFICATION'}" class="badge bg-warning">[[${user.getStatus()}]]</span>
+                                <span th:if="${user.getStatus()=='VERIFIED'}" class="badge bg-success">[[${user.getStatus()}]]</span>
+                                <span th:if="${user.getStatus()=='UNVERIFIED'}" class="badge bg-danger">[[${user.getStatus()}]]</span>
+                            </li>
+
+
+                        </ul>
+
+                        <button th:if="${user.getStatus()=='UNVERIFIED'}" class="btn w-50 btn-dark m-4" data-bs-toggle="modal" data-bs-target="#exampleModal">Get Verified
+                        </button>
+
+                        <!-- Modal -->
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Verification Information</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form th:action="@{/verify-user}" method="post" th:object="${user}" enctype="multipart/form-data">
+                                            <input type="hidden" th:field="*{id}" th:value="${user.getId()}">
+
+
+                                            <div class="form-outline col mb-3">
+                                                <label class="form-label" for="form3Example3">Identity Type</label>
+                                                <select class="form-control" th:field="*{identityType}" >
+                                                    <option value="" disabled>Choose...</option>
+                                                    <option value="National ID">National ID</option>
+                                                    <option value="Passport">Passport</option>
+                                                </select>
+
+                                            </div>
+
+                                            <!-- Email input -->
+                                            <div class="form-outline mb-4">
+                                                <label class="form-label" for="form3Example3">Identity Number</label>
+                                                <input type="text" id="form3Example3"th:field="*{identityNumber}" class="form-control form-control-lg"
+                                                       placeholder="Enter a valid email address" />
+
+                                            </div>
+
+                                            <!-- Password input -->
+                                            <div class="form-outline mb-3">
+                                                <label class="form-label" >Identity Image</label>
+                                                <input type="file" name="image" class="form-control form-control-lg"
+                                                       placeholder="Attach identity image" />
+
+                                            </div>
+
+
+
+<!--                                            <div class="text-center text-lg-start mt-4 pt-2">-->
+<!--                                                <button type="submit" class="btn btn-primary btn-lg"-->
+<!--                                                        style="padding-left: 2.5rem; padding-right: 2.5rem;">Submit</button>-->
+
+<!--                                            </div>-->
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                                                </button>
+                                                <button type="submit" class="btn btn-primary" >Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Navbar -->
+    <!-- Navbar -->
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+</body>
+</html>
